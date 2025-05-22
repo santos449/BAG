@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartão de Lote de Processamento</title>
+    <style>
+        /* Estilos CSS para o cartão (mantidos como no exemplo anterior) */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .card-container h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .input-group input[type="text"],
+        .input-group select {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        .input-group select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M2%200L0%202h4L2%200zM2%205L0%203h4L2%205z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 8px 10px;
+            cursor: pointer;
+        }
+
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .button-group button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-grow: 1;
+            min-width: 150px;
+        }
+
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-group button#clearInfo {
+            background-color: #dc3545;
+        }
+
+        .button-group button#clearInfo:hover {
+            background-color: #c82333;
+        }
+
+        /* Estilos para o popup do QR Code */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #qrCodeDisplay { /* Adicionado para exibir o QR Code no modal */
+            margin: 20px auto;
+            width: 180px;
+            height: 180px;
+            border: 1px solid #eee;
+            padding: 5px;
+            background-color: white;
+            border-radius: 5px;
+            display: block; /* Garante que o QR Code seja um bloco */
+        }
+
+        @media (max-width: 480px) {
+            .button-group button {
+                min-width: unset;
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <h2>Detalhes do Lote de Processamento</h2>
+
+        <div class="input-group">
+            <label for="loteJuliano">Lote de Juliano:</label>
+            <input type="text" id="loteJuliano" placeholder="Ex: 12345">
+        </div>
+
+        <div class="input-group">
+            <label for="loteProcessamento">Lote de Processamento:</label>
+            <input type="text" id="loteProcessamento" placeholder="Ex: 67890">
+        </div>
+
+        <div class="input-group">
+            <label for="produto">Produto:</label>
+            <select id="produto">
+                <option value="">Selecione um produto</option>
+                <option value="Nibs">Nibs</option>
+                <option value="Nibs Esterilizado">Nibs Esterilizado</option>
+                <option value="Nibs Irapuã">Nibs Irapuã</option>
+                <option value="Torta Nao Esterilizada">Torta Não Esterilizada</option>
+                <option value="Torta Esterilizada">Torta Esterilizada</option>
+                <option value="Fibra Alimentar">Fibra Alimentar</option>
+                <option value="Manteiga Granel">Manteiga Granel</option>
+                <option value="Torta Esterilizada de CP">Torta Esterilizada de CP</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="quantidade">Quantidade (kg):</label>
+            <input type="text" id="quantidade" placeholder="Ex: 500">
+        </div>
+
+        <div class="input-group">
+            <label for="fornecedor">Fornecedor:</label>
+            <input type="text" id="fornecedor" placeholder="Ex: Fazenda Boa Esperança">
+        </div>
+
+        <div class="input-group">
+            <label for="origem">Origem:</label>
+            <input type="text" id="origem" placeholder="Ex: Brasil">
+        </div>
+
+        <div class="button-group">
+            <button id="saveInfo">Salvar Cartão</button>
+            <button id="generateQR">Gerar QR Code</button>
+            <button id="clearInfo">Limpar</button>
+        </div>
+    </div>
+
+    <div id="qrCodeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Escaneie o QR Code</h3>
+            <div id="qrCodeDisplay">
+                </div>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #777;">Este QR Code abrirá os detalhes do lote em uma nova página.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+
+    <script>
+        // Função para obter os dados dos campos
+        function getCardData() {
+            return {
+                loteJuliano: document.getElementById('loteJuliano').value,
+                loteProcessamento: document.getElementById('loteProcessamento').value,
+                produto: document.getElementById('produto').value,
+                quantidade: document.getElementById('quantidade').value,
+                fornecedor: document.getElementById('fornecedor').value,
+                origem: document.getElementById('origem').value
+            };
+        }
+
+        // Função para salvar o cartão como um arquivo de texto
+        document.getElementById('saveInfo').addEventListener('click', function() {
+            const data = getCardData();
+            let content = "Lote de Juliano: " + data.loteJuliano + "\n";
+            content += "Lote de Processamento: " + data.loteProcessamento + "\n";
+            content += "Produto: " + data.produto + "\n";
+            content += "Quantidade (kg): " + data.quantidade + "\n";
+            content += "Fornecedor: " + data.fornecedor + "\n";
+            content += "Origem: " + data.origem + "\n";
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'detalhes_lote.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert('Informações do lote salvas como detalhes_lote.txt!');
+        });
+
+        // Configuração do Modal do QR Code
+        const qrCodeModal = document.getElementById('qrCodeModal');
+        const closeButton = document.querySelector('.close-button');
+        const qrCodeDisplay = document.getElementById('qrCodeDisplay');
+
+        // Função para gerar o QR Code (agora aponta para detalhes_lote.html)
+        document.getElementById('generateQR').addEventListener('click', function() {
+            const data = getCardData();
+            // Codifica os dados para a URL
+            const urlParams = new URLSearchParams();
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    urlParams.append(key, data[key]);
+                }
+            }
+
+            // A URL para a nova página que exibirá os detalhes
+            // Importante: `detalhes_lote.html` deve estar no mesmo diretório
+            const detailsPageURL = `detalhes_lote.html?${urlParams.toString()}`;
+
+            // Limpa o container anterior (se houver)
+            qrCodeDisplay.innerHTML = '';
+
+            // Cria o QR Code apontando para a URL da página de detalhes
+            new QRCode(qrCodeDisplay, {
+                text: detailsPageURL,
+                width: 180,
+                height: 180,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            qrCodeModal.style.display = 'flex'; // Exibe o modal
+        });
+
+        // Evento para fechar o modal ao clicar no 'x'
+        closeButton.addEventListener('click', function() {
+            qrCodeModal.style.display = 'none';
+            qrCodeDisplay.innerHTML = ''; // Limpa o QR Code ao fechar
+        });
+
+        // Evento para fechar o modal ao clicar fora do conteúdo
+        window.addEventListener('click', function(event) {
+            if (event.target == qrCodeModal) {
+                qrCodeModal.style.display = 'none';
+                qrCodeDisplay.innerHTML = ''; // Limpa o QR Code ao fechar
+            }
+        });
+
+        // Função para limpar as informações preenchidas
+        document.getElementById('clearInfo').addEventListener('click', function() {
+            document.getElementById('loteJuliano').value = '';
+            document.getElementById('loteProcessamento').value = '';
+            document.getElementById('produto').value = '';
+            document.getElementById('quantidade').value = '';
+            document.getElementById('fornecedor').value = '';
+            document.getElementById('origem').value = '';
+            alert('As informações foram limpas!');
+        });
+    </script>
+</body>
+</html>
